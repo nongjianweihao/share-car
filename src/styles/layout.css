@@ -1,0 +1,78 @@
+.app-container {
+    display: flex;
+    height: 100vh;
+    background: var(--background-color);
+    color: var(--primary-text-color);
+}
+
+.main-content {
+    flex: 1;
+    padding: 40px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    background-color: var(--background-color);
+}
+
+.card-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    max-width: 900px;
+}
+
+.card {
+    width: 100%;
+    background: var(--card-background);
+    border-radius: 16px;
+    box-shadow: 0 8px 30px var(--shadow-color);
+    padding: 30px;
+    border: 1px solid var(--border-color);
+    box-sizing: border-box;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.header h1 {
+    font-size: 2.2rem;
+    margin: 0 0 5px 0;
+}
+
+.header p {
+    font-size: 1.1rem;
+    color: var(--secondary-text-color);
+    margin: 0;
+}
+
+.export-button {
+    padding: 12px 30px;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 8px;
+    border: none;
+    background: var(--accent-color);
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.export-button:hover {
+    background-color: var(--accent-strong);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 1024px) {
+    .app-container {
+        flex-direction: column;
+    }
+
+    .main-content {
+        padding: 24px;
+    }
+}

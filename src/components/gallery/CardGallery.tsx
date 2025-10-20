@@ -1,102 +1,187 @@
-import React, { useMemo } from 'react';
-import { ContentBlock } from '../../domain/card';
-import { resolveRegisteredComponent } from '../../app/componentRegistry';
-import { useCardStore } from '../../state/cardStore';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import CardRenderer from '../common/CardRenderer';
+import { Card } from '../../domain/card';
+import {
+    CardSortOrder,
+    GalleryLayoutMode,
+    GalleryTheme,
+    cardStore,
+    useCardStore,
+} from '../../state/cardStore';
 
-const renderGenericBlock = (block: ContentBlock) => {
-    switch (block.type) {
-        case 'text':
-            return (
-                <p key={block.id} className={`card-block-text card-block-text-${block.emphasis ?? 'default'}`}>
-                    {block.text}
-                </p>
-            );
-        case 'list':
-            return block.ordered ? (
-                <ol key={block.id} className="card-block-list ordered">
-                    {block.items.map(item => (
-                        <li key={item}>{item}</li>
-                    ))}
-                </ol>
-            ) : (
-                <ul key={block.id} className="card-block-list">
-                    {block.items.map(item => (
-                        <li key={item}>{item}</li>
-                    ))}
-                </ul>
-            );
-        case 'quote':
-            return (
-                <blockquote key={block.id} className="card-block-quote">
-                    <p>{block.quote}</p>
-                    {block.attribution && <cite>{block.attribution}</cite>}
-                </blockquote>
-            );
-        case 'media':
-            return (
-                <figure key={block.id} className="card-block-media">
-                    <img src={block.url} alt={block.caption ?? block.id} />
-                    {block.caption && <figcaption>{block.caption}</figcaption>}
-                </figure>
-            );
-        case 'metric':
-            return (
-                <div key={block.id} className="card-block-metric">
-                    <div className="card-block-metric-header">
-                        <span className="card-block-metric-label">{block.label}</span>
-                        <span className="card-block-metric-value">
-                            {block.value}
-                            {block.unit && <span className="card-block-metric-unit">{block.unit}</span>}
-                        </span>
-                    </div>
-                    {(block.target !== undefined || block.description) && (
-                        <div className="card-block-metric-body">
-                            {block.target !== undefined && <span>目标：{block.target}</span>}
-                            {block.description && <p>{block.description}</p>}
-                        </div>
-                    )}
-                </div>
-            );
-        case 'component':
+type SortOrder = CardSortOrder;
+
+type LayoutMode = GalleryLayoutMode;
+
+const layoutBatchSize: Record<LayoutMode, number> = {
+    single: 6,
+    bento: 12,
+    compact: 30,
+};
+
+const sizeByLayout: Record<LayoutMode, 'sm' | 'md' | 'lg'> = {
+    single: 'lg',
+    bento: 'md',
+    compact: 'sm',
+};
+
+const sortCards = (cards: Card[], order: SortOrder): Card[] => {
+    const copy = [...cards];
+    switch (order) {
+        case 'title-asc':
+            return copy.sort((a, b) => a.title.localeCompare(b.title, 'zh-CN'));
+        case 'title-desc':
+            return copy.sort((a, b) => b.title.localeCompare(a.title, 'zh-CN'));
+        case 'updated-asc':
+            return copy.sort((a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime());
+        case 'updated-desc':
         default:
-            return null;
+            return copy.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
     }
 };
 
 const CardGallery: React.FC = () => {
-    const cards = useCardStore(store => store.cards);
-    const filteredCards = useCardStore(store => store.filteredCards);
-    const selectedCardId = useCardStore(store => store.selectedCardId);
+    const cards = useCardStore(store => store.filteredCards);
+    const { sortOrder, layout, theme } = useCardStore(store => store.viewPreferences);
+    const [visibleCount, setVisibleCount] = useState(layoutBatchSize[layout]);
+    const sentinelRef = useRef<HTMLDivElement | null>(null);
+    const observerRef = useRef<IntersectionObserver | null>(null);
 
-    const activeCard = useMemo(() => {
-        if (!selectedCardId) {
-            return filteredCards[0];
+    const sortedCards = useMemo(() => sortCards(cards, sortOrder), [cards, sortOrder]);
+    const limitedCards = useMemo(() => sortedCards.slice(0, visibleCount), [sortedCards, visibleCount]);
+
+    const handleLoadMore = useCallback(() => {
+        setVisibleCount(current => {
+            if (current >= sortedCards.length) {
+                return current;
+            }
+            const next = current + layoutBatchSize[layout];
+            return Math.min(next, sortedCards.length);
+        });
+    }, [layout, sortedCards.length]);
+
+    useEffect(() => {
+        setVisibleCount(layoutBatchSize[layout]);
+    }, [layout, cards.length]);
+
+    useEffect(() => {
+        if (!sentinelRef.current) {
+            return;
         }
 
-        return cards.find(card => card.id === selectedCardId) ?? filteredCards[0];
-    }, [cards, filteredCards, selectedCardId]);
-
-    if (!activeCard) {
-        return <p className="card-gallery-empty">请选择左侧的卡片以查看内容。</p>;
-    }
-
-    const componentBlock = activeCard.blocks.find(block => block.type === 'component');
-
-    if (componentBlock && componentBlock.type === 'component') {
-        const Component = resolveRegisteredComponent(componentBlock.componentId);
-        if (Component) {
-            return <Component {...(componentBlock.props ?? {})} />;
+        if (observerRef.current) {
+            observerRef.current.disconnect();
         }
-    }
+
+        observerRef.current = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    handleLoadMore();
+                }
+            });
+        }, { rootMargin: '200px 0px' });
+
+        observerRef.current.observe(sentinelRef.current);
+
+        return () => observerRef.current?.disconnect();
+    }, [handleLoadMore, limitedCards.length]);
+
+    useEffect(() => () => observerRef.current?.disconnect(), []);
+
+    const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        cardStore.actions.setSortOrder(event.target.value as SortOrder);
+    };
+
+    const handleLayoutChange = (mode: LayoutMode) => {
+        cardStore.actions.setLayoutMode(mode);
+    };
+
+    const handleThemeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        cardStore.actions.setViewTheme(event.target.value as GalleryTheme);
+    };
+
+    const hasMore = visibleCount < sortedCards.length;
+    const empty = sortedCards.length === 0;
 
     return (
-        <article className="card-article">
-            <header className="card-article-header">
-                <h1>{activeCard.title}</h1>
-                {activeCard.summary && <p className="card-summary">{activeCard.summary}</p>}
+        <section className="card-gallery">
+            <header className="card-gallery__toolbar" aria-label="图库视图设置">
+                <div className="card-gallery__toolbar-group">
+                    <label className="card-gallery__label" htmlFor="card-gallery-sort">
+                        排序
+                    </label>
+                    <select
+                        id="card-gallery-sort"
+                        className="card-gallery__select"
+                        value={sortOrder}
+                        onChange={handleSortChange}
+                    >
+                        <option value="updated-desc">最近更新</option>
+                        <option value="updated-asc">最早更新</option>
+                        <option value="title-asc">标题（A-Z）</option>
+                        <option value="title-desc">标题（Z-A）</option>
+                    </select>
+                </div>
+                <div className="card-gallery__toolbar-group" role="radiogroup" aria-label="布局模式">
+                    <button
+                        type="button"
+                        className={`card-gallery__layout-btn ${layout === 'single' ? 'is-active' : ''}`}
+                        onClick={() => handleLayoutChange('single')}
+                        aria-pressed={layout === 'single'}
+                    >
+                        单列
+                    </button>
+                    <button
+                        type="button"
+                        className={`card-gallery__layout-btn ${layout === 'bento' ? 'is-active' : ''}`}
+                        onClick={() => handleLayoutChange('bento')}
+                        aria-pressed={layout === 'bento'}
+                    >
+                        Bento
+                    </button>
+                    <button
+                        type="button"
+                        className={`card-gallery__layout-btn ${layout === 'compact' ? 'is-active' : ''}`}
+                        onClick={() => handleLayoutChange('compact')}
+                        aria-pressed={layout === 'compact'}
+                    >
+                        紧凑
+                    </button>
+                </div>
+                <div className="card-gallery__toolbar-group">
+                    <label className="card-gallery__label" htmlFor="card-gallery-theme">
+                        主题
+                    </label>
+                    <select
+                        id="card-gallery-theme"
+                        className="card-gallery__select"
+                        value={theme}
+                        onChange={handleThemeChange}
+                    >
+                        <option value="light">浅色</option>
+                        <option value="dark">深色</option>
+                        <option value="ocean">海洋</option>
+                    </select>
+                </div>
             </header>
-            {activeCard.blocks.map(renderGenericBlock)}
-        </article>
+            {empty ? (
+                <p className="card-gallery__empty">没有符合条件的卡片，请调整筛选条件。</p>
+            ) : (
+                <div className={`card-gallery__viewport card-gallery__viewport--${layout}`} role="list">
+                    {limitedCards.map(card => (
+                        <CardRenderer
+                            key={card.id}
+                            card={card}
+                            layout={layout}
+                            size={sizeByLayout[layout]}
+                            theme={theme}
+                            accentColor={card.layout?.accentColor}
+                        />
+                    ))}
+                </div>
+            )}
+            {hasMore && <div ref={sentinelRef} className="card-gallery__sentinel" aria-hidden="true" />}
+        </section>
     );
 };
 

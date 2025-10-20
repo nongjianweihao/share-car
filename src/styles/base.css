@@ -1,0 +1,86 @@
+:root {
+    color-scheme: light;
+    --primary-font: 'Noto Sans SC', sans-serif;
+    --handwritten-font: 'ZCOOL KuaiLe', sans-serif;
+    --background-color: #f5f7fb;
+    --surface-color: #ffffff;
+    --card-background: var(--surface-color);
+    --card-surface: var(--surface-color);
+    --shadow-color: rgba(15, 23, 42, 0.08);
+    --primary-text-color: #1f2937;
+    --secondary-text-color: #4b5563;
+    --muted-text-color: #94a3b8;
+    --border-color: #e2e8f0;
+    --accent-color: #2563eb;
+    --accent-strong: #1d4ed8;
+    --accent-soft: rgba(37, 99, 235, 0.12);
+    --card-accent: var(--accent-color);
+    --card-gap: 20px;
+}
+
+:root[data-theme='dark'] {
+    color-scheme: dark;
+    --background-color: #0f172a;
+    --surface-color: #111b2f;
+    --card-background: var(--surface-color);
+    --card-surface: #16213f;
+    --shadow-color: rgba(0, 0, 0, 0.35);
+    --primary-text-color: #e2e8f0;
+    --secondary-text-color: #cbd5f5;
+    --muted-text-color: #64748b;
+    --border-color: rgba(148, 163, 184, 0.2);
+    --accent-color: #60a5fa;
+    --accent-strong: #3b82f6;
+    --accent-soft: rgba(96, 165, 250, 0.18);
+    --card-accent: var(--accent-color);
+}
+
+:root[data-theme='ocean'] {
+    --background-color: #ecf9ff;
+    --surface-color: #ffffff;
+    --card-background: #f8fdff;
+    --card-surface: #ffffff;
+    --shadow-color: rgba(14, 116, 144, 0.12);
+    --primary-text-color: #0f172a;
+    --secondary-text-color: #0e7490;
+    --muted-text-color: #155e75;
+    --border-color: rgba(14, 116, 144, 0.2);
+    --accent-color: #0ea5e9;
+    --accent-strong: #0284c7;
+    --accent-soft: rgba(14, 165, 233, 0.16);
+    --card-accent: var(--accent-color);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: var(--primary-font);
+    background-color: var(--background-color);
+    color: var(--primary-text-color);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+a {
+    color: inherit;
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+::selection {
+    background-color: var(--accent-soft);
+    color: var(--accent-strong);
+}

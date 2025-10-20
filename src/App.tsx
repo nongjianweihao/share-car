@@ -47,6 +47,7 @@ const App: React.FC = () => {
     const searchQuery = useCardStore(store => store.searchQuery);
     const loading = useCardStore(store => store.loading);
     const error = useCardStore(store => store.error);
+    const theme = useCardStore(store => store.viewPreferences.theme);
 
     const categories = useMemo(() => buildCategoryEntries(cards, filteredCards), [cards, filteredCards]);
     const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
@@ -56,6 +57,13 @@ const App: React.FC = () => {
         void cardStore.actions.initialize();
         return cardStore.actions.listenToExternalChanges();
     }, []);
+
+    useEffect(() => {
+        if (typeof document === 'undefined') {
+            return;
+        }
+        document.documentElement.setAttribute('data-theme', theme);
+    }, [theme]);
 
     useEffect(() => {
         setExpandedCategories(prev => {
