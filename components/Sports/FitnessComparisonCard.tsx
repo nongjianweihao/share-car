@@ -6,7 +6,7 @@ import * as htmlToImage from 'html-to-image';
 ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
 const FitnessComparisonCard = () => {
-    const cardRef = useRef(null);
+    const cardRef = useRef<HTMLDivElement | null>(null);
     const data = {
         labels: ['速度', '力量', '耐力', '协调', '灵敏', '平衡', '柔韧', '核心'],
         datasets: [
