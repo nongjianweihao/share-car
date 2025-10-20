@@ -176,6 +176,7 @@ const CardGallery: React.FC = () => {
                             size={sizeByLayout[layout]}
                             theme={theme}
                             accentColor={card.layout?.accentColor}
+                            variant={card.layout?.variant ?? 'default'}
                         />
                     ))}
                 </div>

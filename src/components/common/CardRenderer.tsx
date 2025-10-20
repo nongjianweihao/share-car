@@ -5,6 +5,7 @@ import { resolveRegisteredComponent } from '../../app/componentRegistry';
 type CardLayoutMode = 'single' | 'bento' | 'compact';
 type CardTheme = 'light' | 'dark' | 'ocean';
 type CardSize = 'sm' | 'md' | 'lg';
+type CardVariant = NonNullable<Card['layout']>['variant'] | 'default';
 
 const estimateSpan = (block: ContentBlock, layout: CardLayoutMode): number => {
     if (layout !== 'bento') {
@@ -139,6 +140,7 @@ export interface CardRendererProps {
     theme?: CardTheme;
     size?: CardSize;
     accentColor?: string;
+    variant?: CardVariant;
 }
 
 const CardRenderer: React.FC<CardRendererProps> = ({
@@ -147,27 +149,44 @@ const CardRenderer: React.FC<CardRendererProps> = ({
     theme = 'light',
     size = 'md',
     accentColor,
+    variant: explicitVariant,
 }) => {
     const renderedBlocks = useRenderedBlocks(card.blocks, layout);
     const style = useMemo(() => {
         const styles: Record<string, string> = {};
-        if (accentColor) {
-            styles['--card-accent'] = accentColor;
+        const effectiveAccent = accentColor ?? card.layout?.accentColor;
+        if (effectiveAccent) {
+            styles['--card-accent'] = effectiveAccent;
         }
         if (card.layout?.background) {
             styles['--card-surface'] = card.layout.background;
         }
         return styles as React.CSSProperties;
-    }, [accentColor, card.layout?.background]);
+    }, [accentColor, card.layout?.accentColor, card.layout?.background]);
+
+    const variant = explicitVariant ?? card.layout?.variant ?? 'default';
+    const coverImageUrl = card.layout?.coverImageUrl;
+    const hasCover = Boolean(coverImageUrl);
 
     return (
         <article
-            className="card-renderer"
+            className={`card-renderer card-renderer--${variant}`}
             data-layout={layout}
             data-theme={theme}
             data-size={size}
+            data-variant={variant}
+            data-has-cover={hasCover ? 'true' : undefined}
             style={style}
         >
+            {hasCover && (
+                <figure className="card-renderer__cover">
+                    <img
+                        src={coverImageUrl ?? ''}
+                        alt={card.summary ? `${card.title} - ${card.summary}` : card.title}
+                        loading="lazy"
+                    />
+                </figure>
+            )}
             <header className="card-renderer__header">
                 <div className="card-renderer__heading">
                     <h3>{card.title}</h3>

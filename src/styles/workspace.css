@@ -208,6 +208,52 @@
     gap: 20px;
 }
 
+.workspace-preview {
+    border-top: 1px solid rgba(148, 163, 184, 0.24);
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.workspace-preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.workspace-preview-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.85rem;
+    color: var(--secondary-text-color);
+}
+
+.workspace-preview-body {
+    border-radius: 16px;
+    padding: 20px;
+    background: rgba(148, 163, 184, 0.12);
+    border: 1px dashed rgba(148, 163, 184, 0.4);
+}
+
+.workspace-preview .card-renderer {
+    box-shadow: none;
+    transform: none;
+}
+
+.workspace-preview .card-renderer:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.workspace-preview-note {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--secondary-text-color);
+}
+
 .workspace-add-block {
     display: flex;
     flex-wrap: wrap;
