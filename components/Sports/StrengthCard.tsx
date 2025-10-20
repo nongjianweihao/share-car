@@ -1,3 +1,5 @@
+
+
 import React, { useRef } from 'react';
 import * as htmlToImage from 'html-to-image';
 
@@ -75,4 +77,3 @@ const StrengthCard = () => {
 };
 
 export default StrengthCard;
-
