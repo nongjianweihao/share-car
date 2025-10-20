@@ -52,7 +52,7 @@ const ScientificSportsCard = () => {
                         </div>
                     </div>
                      <div className="sports-action-item">
-                        <div className="sports-action-title">B. 过程 > 结果</div>
+                        <div className="sports-action-title">B. 过程 &gt; 结果</div>
                         <div className="sports-action-content">
                            <p>关注运动的乐趣和习惯养成，而非竞技成绩。</p>
                         </div>
