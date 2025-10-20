@@ -116,6 +116,14 @@ const extractContentBlockText = (block: ContentBlock): string[] => {
             return block.items;
         case 'quote':
             return [block.quote, block.attribution ?? ''];
+        case 'metric':
+            return [
+                block.label,
+                block.description ?? '',
+                block.unit ? `${block.value}${block.unit}` : String(block.value),
+                block.target !== undefined ? `target:${block.target}` : '',
+                block.trend ?? '',
+            ];
         default:
             return [];
     }

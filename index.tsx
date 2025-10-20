@@ -1,7 +1,7 @@
 import './index.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import AppShell from './src/AppShell';
+import App from './src/App';
 
 const rootElement = document.getElementById('root');
 
@@ -10,4 +10,4 @@ if (!rootElement) {
 }
 
 const root = ReactDOM.createRoot(rootElement);
-root.render(<AppShell />);
+root.render(<App />);

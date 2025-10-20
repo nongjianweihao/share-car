@@ -1,4 +1,4 @@
-export type ContentBlockType = 'text' | 'list' | 'quote' | 'component' | 'media';
+export type ContentBlockType = 'text' | 'list' | 'quote' | 'component' | 'media' | 'metric';
 
 export interface BaseContentBlock {
     id: string;
@@ -39,12 +39,23 @@ export interface ComponentContentBlock extends BaseContentBlock {
     props?: Record<string, unknown>;
 }
 
+export interface MetricContentBlock extends BaseContentBlock {
+    type: 'metric';
+    label: string;
+    value: number;
+    target?: number;
+    unit?: string;
+    trend?: 'up' | 'down' | 'neutral';
+    description?: string;
+}
+
 export type ContentBlock =
     | TextContentBlock
     | ListContentBlock
     | QuoteContentBlock
     | MediaContentBlock
-    | ComponentContentBlock;
+    | ComponentContentBlock
+    | MetricContentBlock;
 
 export interface Tag {
     id: string;
@@ -105,6 +116,8 @@ const isContentBlock = (value: unknown): value is ContentBlock => {
             return typeof value.quote === 'string';
         case 'media':
             return typeof value.url === 'string';
+        case 'metric':
+            return typeof value.label === 'string' && typeof value.value === 'number';
         case 'component':
             return typeof value.componentId === 'string';
         default:
