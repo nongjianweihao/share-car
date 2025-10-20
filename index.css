@@ -1,0 +1,376 @@
+:root {
+    --primary-font: 'Noto Sans SC', sans-serif;
+    --handwritten-font: 'ZCOOL KuaiLe', sans-serif;
+    --background-color: #f4f7f6;
+    --card-background: #ffffff;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --primary-text-color: #333;
+    --secondary-text-color: #666;
+    --accent-color: #3498db;
+}
+
+body {
+    margin: 0;
+    font-family: var(--primary-font);
+    background-color: var(--background-color);
+    color: var(--primary-text-color);
+    line-height: 1.6;
+}
+
+/* Main App Layout */
+.app-container {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 280px;
+    background-color: #fff;
+    border-right: 1px solid #e0e0e0;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: var(--primary-text-color);
+    text-align: center;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.sidebar-category {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-category-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    margin: 0 0 10px 0;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #eee;
+}
+
+.sidebar-nav-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    font-family: var(--primary-font);
+    font-size: 1rem;
+    color: #555;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.sidebar-nav-item:hover {
+    background-color: #f0f4f8;
+    color: var(--primary-text-color);
+}
+
+.sidebar-nav-item.active {
+    background-color: var(--accent-color);
+    color: white;
+    font-weight: 500;
+}
+
+.main-content {
+    flex: 1;
+    padding: 40px;
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+/* Card Wrapper & Generic Card Styles */
+.card-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    max-width: 900px;
+}
+
+.card {
+    width: 100%;
+    background: var(--card-background);
+    border-radius: 16px;
+    box-shadow: 0 8px 30px var(--shadow-color);
+    padding: 30px;
+    border: 1px solid #e8e8e8;
+    box-sizing: border-box;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.header h1 {
+    font-size: 2.2rem;
+    margin: 0 0 5px 0;
+}
+
+.header p {
+    font-size: 1.1rem;
+    color: var(--secondary-text-color);
+    margin: 0;
+}
+
+.export-button {
+    padding: 12px 30px;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 8px;
+    border: none;
+    background: var(--accent-color);
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.export-button:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+
+/* 1. FitnessComparisonCard Styles */
+.content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    align-items: center;
+}
+.chart-container {
+    height: 400px;
+}
+.info-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.info-card {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid var(--accent-color);
+}
+
+/* 2. SpecializationTrapCard Styles */
+.header-trap { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
+.title-area h1 { font-size: 2rem; margin: 0; }
+.title-area p { font-size: 1rem; color: var(--secondary-text-color); }
+.badge { background: #f1c40f; color: #333; padding: 5px 15px; border-radius: 5px; font-weight: bold; }
+.balance-scale-container { display: flex; justify-content: center; margin: 40px 0; }
+.balance-scale { position: relative; width: 300px; height: 150px; }
+.pivot { width: 10px; height: 100px; background: #333; margin: 0 auto; border-radius: 5px; }
+.beam { width: 300px; height: 10px; background: #333; position: absolute; top: 20px; left: 0; border-radius: 5px; transform: rotate(-10deg); transition: transform 0.5s; }
+.pan { position: absolute; top: 30px; width: 80px; text-align: center; }
+.pan.left { left: -20px; top: -10px; }
+.pan.right { right: -20px; top: 40px; }
+.weight { width: 40px; height: 20px; background: #95a5a6; margin: 5px auto; border-radius: 3px; }
+.pan.left .weight { height: 40px; background: #e74c3c; }
+.comparison-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.column { padding: 20px; border-radius: 8px; }
+.column h3 { margin-top: 0; }
+.column ul { padding-left: 20px; margin: 0; }
+.gains { background-color: #e9f7ef; }
+.risks { background-color: #fbeee6; }
+.gains li { color: #2ecc71; }
+.risks li { color: #e74c3c; }
+
+/* 3. SensitivePeriodCard Styles */
+.timeline-container { padding: 20px 0; }
+.timeline-axis { display: flex; justify-content: space-between; font-weight: bold; color: #777; padding: 0 5%; }
+.timeline { height: 8px; background: #e0e0e0; border-radius: 4px; position: relative; margin: 10px 0; }
+.golden-window { position: absolute; left: 12.5%; width: 75%; height: 100%; background: #f1c40f; border-radius: 4px; }
+.skill-bars { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+.skill-bar { padding: 10px; border-radius: 5px; color: white; font-weight: 500; text-align: center; }
+.skill-bar.speed { background: #e74c3c; width: 50%; margin-left: 12.5%;}
+.skill-bar.coordination { background: #3498db; width: 50%; margin-left: 25%; }
+.skill-bar.balance { background: #9b59b6; width: 62.5%; margin-left: 12.5%; }
+.skill-bar.flexibility { background: #2ecc71; width: 87.5%; margin-left: 12.5%;}
+.timeline-note { text-align: center; margin-top: 20px; color: var(--secondary-text-color); }
+
+/* 4. CognitionShiftCard Styles */
+.three-tier-structure { display: flex; flex-direction: column; align-items: center; gap: 15px; margin: 40px 0; }
+.tier { text-align: center; }
+.qualities-ring { position: relative; width: 300px; height: 300px; display: flex; justify-content: center; align-items: center; margin-bottom: 10px; }
+.quality-item { position: absolute; background: #f0f4f8; padding: 8px 12px; border-radius: 20px; border: 1px solid #ddd; }
+.tier-icon { font-size: 2.5rem; }
+.tier-label { font-weight: bold; font-size: 1.2rem; }
+.arrow-down { font-size: 2rem; color: #ccc; }
+.summary-text { text-align: center; background: #f9f9f9; padding: 15px; border-radius: 8px; }
+
+/* 5 & 6 & 7 & 8. Magazine/Grid Style Cards (Dose, Strength, Speed, Endurance) */
+.dose-grid-container, .strength-grid-container, .speed-grid-container, .endurance-grid-container { display: grid; gap: 20px; }
+.dose-grid-container { grid-template-columns: repeat(3, 1fr); grid-template-rows: auto; }
+.strength-grid-container, .speed-grid-container, .endurance-grid-container { grid-template-columns: repeat(2, 1fr); grid-template-rows: auto; }
+
+.dose-item, .strength-item, .speed-item, .endurance-item { padding: 20px; border-radius: 12px; }
+.dose-item h2, .strength-item h2, .speed-item h2, .endurance-item h2 { margin-top: 0; font-size: 1.8rem; }
+.dose-item h3, .strength-item h3, .speed-item h3, .endurance-item h3 { margin-top: 0; font-size: 1.1rem; color: #eee; }
+.dose-item h4, .strength-item h4, .speed-item h4, .endurance-item h4 { margin-top: 0; font-size: 1.3rem; }
+.dose-item ul, .strength-item ul, .speed-item ul, .endurance-item ul { padding-left: 20px; margin: 10px 0; }
+
+/* Color schemes */
+.dose-intro { background: #e74c3c; color: white; grid-column: 1 / 4; }
+.dose-tiers { background: #3498db; color: white; }
+.dose-crisis { background: #f1c40f; color: #333; }
+.dose-dopamine { background: #e74c3c; color: white; }
+.dose-comparison { background: #fff; }
+.dose-oxytocin { background: #2c3e50; color: white; }
+.dose-oxytocin-howto { background: #3498db; color: white; }
+.dose-tags span, .strength-tags span, .speed-tags span, .endurance-tags span { background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 5px; font-size: 0.9rem; }
+.dose-quote { background: rgba(0,0,0,0.1); padding: 10px; border-radius: 5px; margin-top: 15px; }
+
+.strength-intro { background: #c0392b; color: white; grid-column: 1 / 3; }
+.strength-types { background: #f39c12; }
+.strength-crisis { background: #2c3e50; color: white; }
+.strength-myths { background: #fff; }
+.strength-benefits { background: #27ae60; color: white; }
+.strength-howto { background: #2980b9; color: white; }
+
+.speed-intro { background: #8e44ad; color: white; grid-column: 1 / 3; }
+.speed-types { background: #16a085; color: white; }
+.speed-crisis { background: #d35400; color: white; }
+.speed-myths { background: #fff; }
+.speed-benefits { background: #2980b9; color: white; }
+.speed-howto { background: #c0392b; color: white; }
+
+.endurance-intro { background: #27ae60; color: white; grid-column: 1 / 3; }
+.endurance-types { background: #f39c12; }
+.endurance-crisis { background: #2c3e50; color: white; }
+.endurance-myths { background: #fff; }
+.endurance-benefits { background: #3498db; color: white; }
+.endurance-howto { background: #8e44ad; color: white; }
+
+/* 9. ScientificSportsCard */
+.sports-card-container { display: flex; background-color: #fff9e6; font-family: var(--handwritten-font); }
+.sports-main-content { flex: 2; padding-right: 20px; }
+.sports-header { text-align: center; margin-bottom: 2rem; }
+.sports-title { font-size: 3rem; background: #ffdd57; padding: 5px 20px; border-radius: 10px; border: 2px solid #333; }
+.sports-quote { margin-top: 10px; color: #555; }
+.sports-centerpiece { position: relative; width: 300px; height: 300px; margin: 2rem auto; }
+.sports-brain-icon { font-size: 6rem; text-align: center; line-height: 300px; }
+.sports-principle { position: absolute; text-align: center; }
+.sports-principle .icon { font-size: 2.5rem; }
+.sports-p1 { top: 0; left: 50%; transform: translateX(-50%); }
+.sports-p2 { top: 50%; right: 0; transform: translateY(-50%); }
+.sports-p3 { bottom: 0; left: 50%; transform: translateX(-50%); }
+.sports-p4 { top: 50%; left: 0; transform: translateY(-50%); }
+.sports-sidebar { flex: 1; border-left: 2px dashed #ccc; padding-left: 20px; display: flex; flex-direction: column; justify-content: space-around; }
+.sports-action-item { background: #fff; border: 2px solid #333; border-radius: 10px; padding: 15px; }
+.sports-action-title { font-size: 1.5rem; font-weight: bold; }
+
+/* 10. ScientificSportsMindmapCard */
+.mindmap-card-container { background: #FEFEFA; font-family: var(--handwritten-font); color: #4A4A4A; }
+.mindmap-header { text-align: center; margin-bottom: 2rem; }
+.mindmap-title { background-color: #FFC900; color: #333; padding: 0.5rem 2rem; border-radius: 999px; border: 3px solid #333; display: inline-block; font-size: 2.5rem; font-weight: bold; transform: rotate(-2deg); box-shadow: 4px 4px 0 #333; }
+.mindmap-quote { margin-top: 1rem; color: #666; font-size: 1.1rem; }
+.mindmap-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+.mindmap-centerpiece { position: relative; display: flex; justify-content: center; align-items: center; min-height: 20rem; }
+.mindmap-centerpiece svg { width: 12rem; height: 12rem; color: #FFC900; }
+.mindmap-quadrants { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+.mindmap-quadrant-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+.mindmap-icon-circle { width: 4rem; height: 4rem; border-radius: 50%; border: 3px solid #333; display: flex; align-items: center; justify-content: center; background-color: white; box-shadow: 3px 3px 0 #ddd; }
+.mindmap-icon-circle span { font-size: 2rem; }
+.mindmap-icon-circle-red { background-color: #fed7d7; }
+.mindmap-icon-circle-blue { background-color: #cce5ff; }
+.mindmap-icon-circle-green { background-color: #d4edda; }
+.mindmap-icon-circle-purple { background-color: #e9d8fd; }
+.mindmap-section-title { font-size: 1.5rem; font-weight: bold; color: #333; }
+.mindmap-quadrant ul { list-style: none; padding: 0; }
+.mindmap-quadrant li { margin-bottom: 0.5rem; }
+.mindmap-highlight-box { background-color: #FFFBEB; border: 2px dashed #FBBF24; padding: 0.5rem 1rem; border-radius: 0.5rem; margin-top: 1rem; }
+.mindmap-sidebar { display: flex; flex-direction: column; gap: 2rem; }
+.mindmap-panel { border: 3px solid #333; border-radius: 1.5rem; background-color: white; padding: 1.5rem; }
+.mindmap-panel h3 { margin: 0 0 0.5rem 0; font-size: 1.25rem; font-weight: bold; }
+.mindmap-panel-red { color: #e53e3e; }
+.mindmap-panel-blue { color: #3182ce; }
+.mindmap-panel-green { color: #38a169; }
+.mindmap-flow { text-align: center; }
+.mindmap-flow-item { background-color: #FFFBEB; border: 2px solid #FBBF24; border-radius: 0.5rem; padding: 0.5rem; }
+.mindmap-flow-arrow { font-size: 1.5rem; margin: 0.5rem 0; }
+
+/* 11 & 12. Reasoning Card, Family Ed Card, etc. */
+.summary-text { padding: 15px; border-radius: 8px; margin-top: 20px; }
+.brain-diagram { display: flex; justify-content: space-around; text-align: center; padding: 20px 0; border-top: 1px solid #eee; border-bottom: 1px solid #eee; margin: 20px 0; }
+.brain-icon { font-size: 48px; }
+
+/* Reasoning vs Emotion Card */
+.reasoning-grid-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto;
+    gap: 20px;
+}
+.reasoning-item { padding: 20px; border-radius: 12px; }
+.reasoning-intro { background: #4a90e2; color: white; grid-column: 1 / 3; }
+.reasoning-why { background: #f5a623; color: white; }
+.reasoning-how { background: #50e3c2; color: #333; }
+.reasoning-steps { background: #bd10e0; color: white; grid-column: 1 / 3; }
+
+/* Logical Thinking Card */
+.logical-thinking-card { background: #fdfdfb; font-family: var(--handwritten-font); border: 1px solid #eee; }
+.lt-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+.lt-header { text-align: center; margin-bottom: 2rem; }
+.lt-title-wrapper { display: inline-block; background-color: #ffde7d; padding: 0.5rem 1rem; border: 2px solid #333; }
+.lt-title { font-size: 2rem; color: #333; }
+.lt-quote { color: #555; margin-top: 0.5rem; }
+.lt-main { position: relative; text-align: center; }
+.lt-lightbulb { width: 10rem; height: 10rem; margin: 2rem auto; }
+.lt-section { margin-bottom: 1.5rem; }
+.lt-section-title { font-size: 1.25rem; font-weight: bold; margin-bottom: 0.5rem; }
+.lt-sidebar { border-left: 2px dashed #ccc; padding-left: 20px; display: flex; flex-direction: column; gap: 1.5rem; }
+.lt-sidebar-section { background: #fff; padding: 1rem; border: 2px solid #ddd; border-radius: 8px; }
+.lt-sidebar-title { font-size: 1.25rem; font-weight: bold; margin-bottom: 0.5rem; }
+.lt-rocket-diagram, .lt-bulbs-diagram, .lt-pyramid-diagram { margin-top: 1rem; }
+
+/* Nonviolent Communication Card */
+.nvc-grid-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+.nvc-item { padding: 20px; border-radius: 12px; }
+.nvc-item h4 { margin-top: 0; font-size: 1.5rem; }
+.nvc-intro { background: #5d3d7c; color: white; grid-column: 1 / 3; }
+.nvc-observation { background: #27ae60; color: white; }
+.nvc-feelings { background: #e74c3c; color: white; }
+.nvc-needs { background: #2980b9; color: white; }
+.nvc-requests { background: #f39c12; color: white; }
+.nvc-summary { background: #f0f4f8; grid-column: 1 / 3; text-align: center; }
+
+/* Responsive Adjustments */
+@media (max-width: 1200px) {
+    .content { grid-template-columns: 1fr; }
+    .chart-container { height: 300px; }
+}
+@media (max-width: 768px) {
+    .app-container { flex-direction: column; height: auto; }
+    .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #e0e0e0; }
+    .main-content { padding: 20px; }
+    .card { padding: 20px; }
+    .header h1 { font-size: 1.8rem; }
+    .mindmap-grid { grid-template-columns: 1fr; }
+    .lt-grid { grid-template-columns: 1fr; }
+    .mindmap-sidebar { margin-top: 2rem; }
+    .lt-sidebar { border-left: none; padding-left: 0; margin-top: 2rem; }
+}
