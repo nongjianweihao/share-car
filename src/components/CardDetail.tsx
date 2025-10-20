@@ -1,9 +1,11 @@
 import type { FC } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import type { Card } from '../types';
+import type { Card, CardStyleId } from '../types';
 import QrButton from './QrButton';
 import { exportShareHtml } from '../lib/exportShare';
+import StylePicker from './StylePicker';
+import { useCardStore } from '../store/cardStore';
 
 interface CardDetailProps {
   card: Card | null;
@@ -11,6 +13,8 @@ interface CardDetailProps {
 }
 
 const CardDetail: FC<CardDetailProps> = ({ card, shareBaseUrl }) => {
+  const updateCardStyle = useCardStore((state) => state.updateCardStyle);
+
   if (!card) {
     return (
       <section className="card-detail">
@@ -20,6 +24,10 @@ const CardDetail: FC<CardDetailProps> = ({ card, shareBaseUrl }) => {
   }
 
   const shareUrl = `${shareBaseUrl}${card.shareSlug ?? card.id}`;
+
+  const handleStyleChange = (nextStyle?: CardStyleId) => {
+    void updateCardStyle(card.id, nextStyle);
+  };
 
   return (
     <section className="card-detail">
@@ -39,6 +47,9 @@ const CardDetail: FC<CardDetailProps> = ({ card, shareBaseUrl }) => {
           <QrButton url={shareUrl} filename={`${card.shareSlug ?? card.id}.png`} />
         </div>
       </header>
+      <div className="card-detail-style">
+        <StylePicker value={card.style} onChange={handleStyleChange} />
+      </div>
       <article className="card-detail-body">
         {card.coverUrl ? <img className="card-detail-cover" src={card.coverUrl} alt="" /> : null}
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{card.contentMd}</ReactMarkdown>
