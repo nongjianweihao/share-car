@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import * as htmlToImage from 'html-to-image';
 
 const CognitionShiftCard = () => {
-    const cardRef = useRef(null);
+    const cardRef = useRef<HTMLDivElement | null>(null);
     const qualities = ['速度', '力量', '耐力', '协调', '灵敏', '平衡', '柔韧', '核心'];
     const handleExport = () => {
         if (cardRef.current) {

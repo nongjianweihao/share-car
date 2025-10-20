@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import * as htmlToImage from 'html-to-image';
 
 const SpeedCard = () => {
-    const cardRef = useRef(null);
+    const cardRef = useRef<HTMLDivElement | null>(null);
 
     const handleExport = () => {
         if (cardRef.current) {
