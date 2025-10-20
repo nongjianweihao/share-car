@@ -1,5 +1,5 @@
 import './index.css';
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import FitnessComparisonCard from './components/Sports/FitnessComparisonCard';
 import SpecializationTrapCard from './components/Sports/SpecializationTrapCard';
@@ -18,7 +18,14 @@ import NonviolentCommunicationCard from './components/CommunicationSkills/Nonvio
 
 
 // Data structure for all available cards, now with categories
-const cards = [
+type CardConfig = {
+    id: string;
+    title: string;
+    category: string;
+    component: JSX.Element;
+};
+
+const cards: CardConfig[] = [
     { id: 'fitness', title: '全面体能', category: '运动', component: <FitnessComparisonCard /> },
     { id: 'trap', title: '专项陷阱', category: '运动', component: <SpecializationTrapCard /> },
     { id: 'period', title: '敏感期', category: '运动', component: <SensitivePeriodCard /> },
@@ -37,34 +44,162 @@ const cards = [
 
 const App = () => {
     const [activeCardId, setActiveCardId] = useState(cards[0].id);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+
+    type CategoryEntry = {
+        name: string;
+        cards: CardConfig[];
+        total: number;
+    };
+
+    const categoryEntries = useMemo<CategoryEntry[]>(() => {
+        const grouped = cards.reduce<Record<string, CardConfig[]>>((acc, card) => {
+            (acc[card.category] = acc[card.category] || []).push(card);
+            return acc;
+        }, {});
+
+        return Object.entries(grouped).map(([name, groupedCards]) => ({
+            name,
+            cards: groupedCards,
+            total: groupedCards.length,
+        }));
+    }, []);
+
+    const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>(() =>
+        categoryEntries.reduce<Record<string, boolean>>((acc, entry) => {
+            acc[entry.name] = true;
+            return acc;
+        }, {})
+    );
+
+    const filteredCategories = useMemo<CategoryEntry[]>(() => {
+        return categoryEntries
+            .map(entry => {
+                const matchingCards = normalizedSearch
+                    ? entry.cards.filter(card => {
+                          const normalizedTitle = card.title.toLowerCase();
+                          const normalizedCategory = card.category.toLowerCase();
+                          const normalizedId = card.id.toLowerCase();
+
+                          return (
+                              normalizedTitle.includes(normalizedSearch) ||
+                              normalizedCategory.includes(normalizedSearch) ||
+                              normalizedId.includes(normalizedSearch)
+                          );
+                      })
+                    : entry.cards;
+
+                return {
+                    ...entry,
+                    cards: matchingCards,
+                };
+            })
+            .filter(entry => entry.cards.length > 0 || !normalizedSearch);
+    }, [categoryEntries, normalizedSearch]);
+
+    useEffect(() => {
+        if (!normalizedSearch) {
+            return;
+        }
+
+        setExpandedCategories(prev => {
+            const next = { ...prev };
+
+            filteredCategories.forEach(entry => {
+                if (entry.cards.length > 0) {
+                    next[entry.name] = true;
+                }
+            });
+
+            return next;
+        });
+    }, [filteredCategories, normalizedSearch]);
+
+    const hasResults = filteredCategories.some(entry => entry.cards.length > 0);
+
+    const toggleCategory = (categoryName: string) => {
+        setExpandedCategories(prev => ({
+            ...prev,
+            [categoryName]: !prev[categoryName],
+        }));
+    };
 
     const activeCard = cards.find(card => card.id === activeCardId);
-    
-    // Group cards by category
-    const categories = cards.reduce((acc, card) => {
-        (acc[card.category] = acc[card.category] || []).push(card);
-        return acc;
-    }, {} as Record<string, typeof cards>);
 
     return (
         <div className="app-container">
             <aside className="sidebar">
                 <h2 className="sidebar-title">分享卡片</h2>
+                <div className="sidebar-search" role="search">
+                    <span className="sidebar-search-icon" aria-hidden="true" />
+                    <input
+                        type="search"
+                        className="sidebar-search-input"
+                        placeholder="搜索卡片或分类..."
+                        value={searchTerm}
+                        onChange={event => setSearchTerm(event.target.value)}
+                    />
+                    {searchTerm && (
+                        <button
+                            type="button"
+                            className="sidebar-search-clear"
+                            aria-label="清除搜索"
+                            onClick={() => setSearchTerm('')}
+                        >
+                            ×
+                        </button>
+                    )}
+                </div>
                 <nav className="sidebar-nav">
-                    {Object.entries(categories).map(([category, cardsInCategory]) => (
-                        <div key={category} className="sidebar-category">
-                            <h3 className="sidebar-category-title">{category}</h3>
-                            {cardsInCategory.map(card => (
-                                <button
-                                    key={card.id}
-                                    className={`sidebar-nav-item ${activeCardId === card.id ? 'active' : ''}`}
-                                    onClick={() => setActiveCardId(card.id)}
-                                >
-                                    {card.title}
-                                </button>
-                            ))}
-                        </div>
-                    ))}
+                    {hasResults ? (
+                        filteredCategories.map(entry => {
+                            const isExpanded = expandedCategories[entry.name];
+                            const visibleCount = entry.cards.length;
+                            const countLabel =
+                                visibleCount === entry.total || normalizedSearch
+                                    ? `${visibleCount}`
+                                    : `${visibleCount}/${entry.total}`;
+
+                            return (
+                                <section key={entry.name} className="sidebar-category">
+                                    <button
+                                        type="button"
+                                        className="sidebar-category-header"
+                                        onClick={() => toggleCategory(entry.name)}
+                                        aria-expanded={isExpanded}
+                                    >
+                                        <span className="sidebar-category-name">{entry.name}</span>
+                                        <span className="sidebar-category-meta">
+                                            <span className="sidebar-category-count" aria-label={`共 ${entry.total} 张卡片`}>
+                                                {countLabel}
+                                            </span>
+                                            <span
+                                                className={`sidebar-category-chevron ${isExpanded ? 'open' : ''}`}
+                                                aria-hidden="true"
+                                            />
+                                        </span>
+                                    </button>
+                                    {isExpanded && (
+                                        <div className="sidebar-category-items">
+                                            {entry.cards.map(card => (
+                                                <button
+                                                    key={card.id}
+                                                    className={`sidebar-nav-item ${activeCardId === card.id ? 'active' : ''}`}
+                                                    onClick={() => setActiveCardId(card.id)}
+                                                >
+                                                    {card.title}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </section>
+                            );
+                        })
+                    ) : (
+                        <p className="sidebar-empty">未找到匹配的卡片，请尝试其他关键词。</p>
+                    )}
                 </nav>
             </aside>
             <main className="main-content">
