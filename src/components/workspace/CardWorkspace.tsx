@@ -9,7 +9,8 @@ import {
     createCard,
 } from '../../domain/card';
 import { cardRepository } from '../../services/cardRepository';
-import { cardStore, useCardStore } from '../../state/cardStore';
+import { cardStore, useCardStore, GalleryLayoutMode, GalleryTheme } from '../../state/cardStore';
+import CardRenderer from '../common/CardRenderer';
 import {
     ListBlockEditor,
     MetricBlockEditor,
@@ -29,6 +30,24 @@ const blockPalette: Array<{
     { type: 'metric', label: '指标条', description: '突出展示指标数值与趋势。' },
     { type: 'quote', label: '引用', description: '引用经典语句或总结观点。' },
 ];
+
+const previewSizeByLayout: Record<GalleryLayoutMode, 'sm' | 'md' | 'lg'> = {
+    single: 'lg',
+    bento: 'md',
+    compact: 'sm',
+};
+
+const layoutLabels: Record<GalleryLayoutMode, string> = {
+    single: '单列',
+    bento: 'Bento',
+    compact: '紧凑',
+};
+
+const themeLabels: Record<GalleryTheme, string> = {
+    light: '浅色',
+    dark: '深色',
+    ocean: '海洋',
+};
 
 const createBlock = (type: ContentBlockType): ContentBlock => {
     switch (type) {
@@ -150,6 +169,8 @@ const CardWorkspace: React.FC = () => {
     const selectedCardId = useCardStore(store => store.selectedCardId);
     const loading = useCardStore(store => store.loading);
     const error = useCardStore(store => store.error);
+    const previewLayout = useCardStore(store => store.viewPreferences.layout);
+    const previewTheme = useCardStore(store => store.viewPreferences.theme);
 
     const selectedCard = useMemo(
         () => cards.find(card => card.id === selectedCardId),
@@ -417,6 +438,9 @@ const CardWorkspace: React.FC = () => {
     const tagInputValue = useMemo(() => (draft ? formatTags(draft.tags) : ''), [draft]);
     const canUndo = history.length > 0;
     const canRedo = future.length > 0;
+    const previewSize = previewSizeByLayout[previewLayout];
+    const previewLayoutLabel = layoutLabels[previewLayout];
+    const previewThemeLabel = themeLabels[previewTheme];
 
     const renderBlockEditor = (block: ContentBlock) => {
         switch (block.type) {
@@ -673,6 +697,26 @@ const CardWorkspace: React.FC = () => {
                             </footer>
                         </article>
                     ))}
+                </section>
+                <section className="workspace-preview" aria-label="即时预览">
+                    <div className="workspace-preview-header">
+                        <h3>即时预览</h3>
+                        <div className="workspace-preview-meta">
+                            <span>{previewLayoutLabel} 布局</span>
+                            <span>{previewThemeLabel} 主题</span>
+                        </div>
+                    </div>
+                    <div className="workspace-preview-body">
+                        <CardRenderer
+                            card={draft}
+                            layout={previewLayout}
+                            size={previewSize}
+                            theme={previewTheme}
+                            accentColor={draft.layout?.accentColor}
+                            variant={draft.layout?.variant ?? 'default'}
+                        />
+                    </div>
+                    <p className="workspace-preview-note">调整内容或样式选项时，预览会立即同步更新。</p>
                 </section>
             </div>
             <aside className="workspace-properties">
