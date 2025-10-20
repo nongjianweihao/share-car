@@ -2,6 +2,60 @@ import React, { useMemo } from 'react';
 import { Card, ContentBlock } from '../../domain/card';
 import { resolveRegisteredComponent } from '../../app/componentRegistry';
 
+const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
+
+const hexToRgb = (hexColor: string): { r: number; g: number; b: number } | null => {
+    const normalized = hexColor.trim().replace(/^#/, '');
+    const expanded =
+        normalized.length === 3
+            ? normalized
+                  .split('')
+                  .map(char => char.repeat(2))
+                  .join('')
+            : normalized;
+
+    if (expanded.length !== 6) {
+        return null;
+    }
+
+    const value = Number.parseInt(expanded, 16);
+    if (Number.isNaN(value)) {
+        return null;
+    }
+    return {
+        r: (value >> 16) & 255,
+        g: (value >> 8) & 255,
+        b: value & 255,
+    };
+};
+
+const toRgba = (hexColor: string, alpha: number) => {
+    const rgb = hexToRgb(hexColor);
+    if (!rgb) {
+        return hexColor;
+    }
+    const safeAlpha = clamp(alpha, 0, 1);
+    return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${safeAlpha})`;
+};
+
+const mixWith = (hexColor: string, target: { r: number; g: number; b: number }, amount: number) => {
+    const rgb = hexToRgb(hexColor);
+    if (!rgb) {
+        return hexColor;
+    }
+    const weight = clamp(amount, 0, 1);
+    const mixChannel = (source: number, destination: number) =>
+        Math.round(source * (1 - weight) + destination * weight);
+
+    return `rgb(${mixChannel(rgb.r, target.r)}, ${mixChannel(rgb.g, target.g)}, ${mixChannel(rgb.b, target.b)})`;
+};
+
+const lightenColor = (hexColor: string, amount: number) =>
+    mixWith(hexColor, { r: 255, g: 255, b: 255 }, amount);
+
+const darkenColor = (hexColor: string, amount: number) =>
+    mixWith(hexColor, { r: 0, g: 0, b: 0 }, amount);
+
 type CardLayoutMode = 'single' | 'bento' | 'compact';
 type CardTheme = 'light' | 'dark' | 'ocean';
 type CardSize = 'sm' | 'md' | 'lg';
@@ -157,6 +211,11 @@ const CardRenderer: React.FC<CardRendererProps> = ({
         const effectiveAccent = accentColor ?? card.layout?.accentColor;
         if (effectiveAccent) {
             styles['--card-accent'] = effectiveAccent;
+            styles['--accent-color'] = effectiveAccent;
+            styles['--accent-strong'] = darkenColor(effectiveAccent, 0.2);
+            styles['--accent-soft'] = toRgba(effectiveAccent, 0.16);
+            styles['--card-accent-gradient-start'] = darkenColor(effectiveAccent, 0.1);
+            styles['--card-accent-gradient-end'] = lightenColor(effectiveAccent, 0.25);
         }
         if (card.layout?.background) {
             styles['--card-surface'] = card.layout.background;

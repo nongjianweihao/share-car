@@ -177,7 +177,11 @@
     border-color: transparent;
     background: var(
         --card-surface,
-        linear-gradient(140deg, rgba(37, 99, 235, 0.9), rgba(59, 130, 246, 0.6))
+        linear-gradient(
+            140deg,
+            var(--card-accent-gradient-start, rgba(37, 99, 235, 0.9)),
+            var(--card-accent-gradient-end, rgba(59, 130, 246, 0.6))
+        )
     );
     box-shadow: 0 20px 45px rgba(15, 23, 42, 0.35);
     overflow: hidden;
@@ -339,8 +343,8 @@
 .card-renderer__tags li {
     padding: 4px 10px;
     border-radius: 999px;
-    background: rgba(37, 99, 235, 0.12);
-    color: var(--accent-strong);
+    background: var(--accent-soft, rgba(37, 99, 235, 0.12));
+    color: var(--accent-strong, var(--card-accent));
     font-size: 0.78rem;
     font-weight: 600;
 }
