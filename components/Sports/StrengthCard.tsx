@@ -1,8 +1,10 @@
+
+
 import React, { useRef } from 'react';
 import * as htmlToImage from 'html-to-image';
 
 const StrengthCard = () => {
-    const cardRef = useRef<HTMLDivElement | null>(null);
+    const cardRef = useRef(null);
 
     const handleExport = () => {
         if (cardRef.current) {
