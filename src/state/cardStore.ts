@@ -2,6 +2,16 @@ import { useSyncExternalStore } from 'react';
 import { Card } from '../domain/card';
 import { cardRepository } from '../services/cardRepository';
 
+export type CardSortOrder = 'updated-desc' | 'updated-asc' | 'title-asc' | 'title-desc';
+export type GalleryLayoutMode = 'single' | 'bento' | 'compact';
+export type GalleryTheme = 'light' | 'dark' | 'ocean';
+
+export interface ViewPreferences {
+    sortOrder: CardSortOrder;
+    layout: GalleryLayoutMode;
+    theme: GalleryTheme;
+}
+
 export interface CardStoreState {
     cards: Card[];
     filteredCards: Card[];
@@ -10,6 +20,7 @@ export interface CardStoreState {
     tagFilters: string[];
     loading: boolean;
     error?: string;
+    viewPreferences: ViewPreferences;
 }
 
 const listeners = new Set<() => void>();
@@ -22,6 +33,11 @@ let state: CardStoreState = {
     tagFilters: [],
     loading: false,
     error: undefined,
+    viewPreferences: {
+        sortOrder: 'updated-desc',
+        layout: 'bento',
+        theme: 'light',
+    },
 };
 
 const notify = () => {
@@ -140,6 +156,21 @@ const actions = {
     saveMany: async (cards: Card[]) => {
         await cardRepository.saveMany(cards);
         await loadCards();
+    },
+    setSortOrder: (sortOrder: CardSortOrder) => {
+        setState(prev => ({
+            viewPreferences: { ...prev.viewPreferences, sortOrder },
+        }));
+    },
+    setLayoutMode: (layout: GalleryLayoutMode) => {
+        setState(prev => ({
+            viewPreferences: { ...prev.viewPreferences, layout },
+        }));
+    },
+    setViewTheme: (theme: GalleryTheme) => {
+        setState(prev => ({
+            viewPreferences: { ...prev.viewPreferences, theme },
+        }));
     },
     listenToExternalChanges: () => {
         if (typeof window === 'undefined') {
