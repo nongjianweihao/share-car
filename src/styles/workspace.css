@@ -1,11 +1,19 @@
 .card-workspace {
     display: grid;
-    grid-template-columns: 280px 1fr 300px;
+    grid-template-columns: minmax(0, 1fr) 300px;
     gap: 24px;
 }
 
-.card-workspace.empty-state {
-    grid-template-columns: 280px 1fr;
+.card-workspace--blank {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+}
+
+.card-workspace--blank .workspace-empty {
+    max-width: 420px;
+    text-align: center;
 }
 
 .workspace-panel {
@@ -47,7 +55,7 @@
 }
 
 .workspace-button.secondary {
-    background: rgba(37, 99, 235, 0.12);
+    background: var(--accent-soft);
     color: var(--accent-strong);
 }
 

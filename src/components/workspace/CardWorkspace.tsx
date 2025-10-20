@@ -165,10 +165,7 @@ const buildInitialCard = () => {
 
 const CardWorkspace: React.FC = () => {
     const cards = useCardStore(store => store.cards);
-    const filteredCards = useCardStore(store => store.filteredCards);
     const selectedCardId = useCardStore(store => store.selectedCardId);
-    const loading = useCardStore(store => store.loading);
-    const error = useCardStore(store => store.error);
     const previewLayout = useCardStore(store => store.viewPreferences.layout);
     const previewTheme = useCardStore(store => store.viewPreferences.theme);
 
@@ -368,17 +365,6 @@ const CardWorkspace: React.FC = () => {
         void cardStore.actions.selectCard(undefined);
     };
 
-    const handleSelectCard = (cardId: string) => {
-        if (isDirty) {
-            const confirmSwitch = window.confirm('当前卡片尚未保存，切换后修改将丢失，是否继续？');
-            if (!confirmSwitch) {
-                return;
-            }
-        }
-        setIsNewDraft(false);
-        void cardStore.actions.selectCard(cardId);
-    };
-
     const handleDelete = async () => {
         if (!draft || isNewDraft) {
             setDraft(undefined);
@@ -481,50 +467,13 @@ const CardWorkspace: React.FC = () => {
         }
     };
 
-    const workspaceList = (
-        <div className="workspace-panel workspace-panel-list">
-            <div className="workspace-panel-header">
-                <h3>卡片列表</h3>
-                <button className="workspace-button primary" type="button" onClick={handleNewCard}>
-                    新建卡片
-                </button>
-            </div>
-            {loading && <p className="workspace-empty">正在加载卡片...</p>}
-            {!loading && error && <p className="workspace-empty">{error}</p>}
-            {!loading && !error && (
-                <ul className="workspace-card-list">
-                    {filteredCards.map(card => (
-                        <li key={card.id}>
-                            <button
-                                type="button"
-                                className={`workspace-card-item ${
-                                    draft?.id === card.id && !isNewDraft ? 'active' : ''
-                                }`}
-                                onClick={() => handleSelectCard(card.id)}
-                            >
-                                <span className="workspace-card-title">{card.title}</span>
-                                <span className="workspace-card-meta">
-                                    {new Date(card.updatedAt).toLocaleDateString()}
-                                </span>
-                            </button>
-                        </li>
-                    ))}
-                    {filteredCards.length === 0 && (
-                        <li className="workspace-empty">暂无卡片，尝试调整搜索条件。</li>
-                    )}
-                </ul>
-            )}
-        </div>
-    );
-
     if (!draft) {
         return (
-            <div className="card-workspace empty-state">
-                {workspaceList}
-                <div className="workspace-empty-main">
-                    <p>请选择左侧的卡片或新建一张卡片开始编辑。</p>
+            <div className="card-workspace card-workspace--blank">
+                <div className="workspace-empty">
+                    <p>请选择一张卡片或新建卡片开始编辑。</p>
                     <button type="button" className="workspace-button primary" onClick={handleNewCard}>
-                        立即新建
+                        新建卡片
                     </button>
                 </div>
             </div>
@@ -533,7 +482,6 @@ const CardWorkspace: React.FC = () => {
 
     return (
         <div className="card-workspace">
-            {workspaceList}
             <div className="workspace-editor">
                 <header className="workspace-editor-header">
                     <div className="workspace-editor-title-group">
@@ -553,6 +501,9 @@ const CardWorkspace: React.FC = () => {
                         />
                     </div>
                     <div className="workspace-editor-actions">
+                        <button type="button" className="workspace-button secondary" onClick={handleNewCard}>
+                            新建卡片
+                        </button>
                         <button
                             type="button"
                             className="workspace-button"
